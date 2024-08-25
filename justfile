@@ -1,3 +1,5 @@
+PROJECT_NAME := "aeternum"
+
 # Default command
 default:
     @just --list
@@ -19,7 +21,7 @@ test:
 # Build Docker image
 build tag="latest":
 	@echo "Building Docker image (tag={{ tag }})..."
-	docker build -t aeternum:{{ tag }} -f ./docker/server.Dockerfile .
+	docker build -t {{ PROJECT_NAME }}:{{ tag }} -f ./docker/server.Dockerfile .
 	@echo "Docker image built successfully!"
 
 # Sync Go modules
@@ -34,4 +36,4 @@ compose-up:
 # Stop all Compose containers and delete images created
 compose-down:
     docker compose -f docker/docker-compose.yml down
-    docker rmi $(docker images | grep "aeternum" | awk "{print \$3}")
+    docker rmi $(docker images | grep "{{ PROJECT_NAME }}" | awk "{print \$3}")
