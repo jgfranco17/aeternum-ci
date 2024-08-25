@@ -19,7 +19,7 @@ test:
     go test -cover ./api/...
 
 # Build Docker image
-build tag="latest":
+build tag="latest": test
 	@echo "Building Docker image (tag={{ tag }})..."
 	docker build -t {{ PROJECT_NAME }}:{{ tag }} -f ./docker/server.Dockerfile .
 	@echo "Docker image built successfully!"
