@@ -41,3 +41,12 @@ docker-detached:
 docker-down:
     docker compose down
     @echo "Compose server closed successfully!"
+
+# Start Compose with load-balancer
+compose-up:
+    docker compose -f docker/docker-compose.yml up
+
+# Stop all Compose containers and delete images created
+compose-down:
+    docker compose -f docker/docker-compose.yml down
+    docker rmi $(docker images | grep "aeternum" | awk "{print \$3}")

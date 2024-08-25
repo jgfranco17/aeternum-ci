@@ -57,7 +57,7 @@ docker build -t aeternum-ci .
 docker run -p 8080:8080 aeternum-ci
 
 # Docker-Compose build
-docker compose up
+docker compose -f docker/docker-compose.yml up
 ```
 
 ## 🔧 Testing <a name = "testing"></a>
