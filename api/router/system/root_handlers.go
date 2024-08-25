@@ -23,7 +23,7 @@ func ServiceInfoHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, data.AboutInfo{
 		Name:        "Aeternum API",
 		Author:      "Joaquin Franco",
-		Repository:  "https://api",
+		Repository:  "https://github.com/jgfranco17/aeternum-ci",
 		Environment: env.GetApplicationEnv(),
 		License:     "MIT",
 		Languages:   []string{"Go"},

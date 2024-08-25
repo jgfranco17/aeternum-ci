@@ -17,30 +17,15 @@ test:
     go test -cover ./api/...
 
 # Build Docker image
-build:
-	@echo "Building Docker image..."
-	docker build -t aeturnum:latest -f .docker/api.Dockerfile .
+build tag="latest":
+	@echo "Building Docker image (tag={{ tag }})..."
+	docker build -t aeternum:{{ tag }} -f ./docker/server.Dockerfile .
 	@echo "Docker image built successfully!"
 
 # Sync Go modules
 tidy:
     cd api && go mod tidy
     go work sync
-
-# Start up Docker Compose server
-docker-up:
-    @echo "Starting up full Docker suite..."
-    docker compose up --build
-
-# Start up Docker Compose server in detached mode
-docker-detached:
-    @echo "Starting up full Docker suite..."
-    docker compose up -d
-
-# Clean up Docker container remnants
-docker-down:
-    docker compose down
-    @echo "Compose server closed successfully!"
 
 # Start Compose with load-balancer
 compose-up:
