@@ -5,9 +5,13 @@ on:
     branches:
       - main
 
+env:
+  DOCKER_REGISTRY: ghcr.io/jgfranco17/aeternum-ci
+
 jobs:
-  verify:
+  release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -28,10 +32,10 @@ jobs:
         run: |
           just test
 
-  release:
+  publish:
     runs-on: ubuntu-latest
     if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
-    needs: verify
+    needs: release
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -41,14 +45,26 @@ jobs:
         with:
           go-version: "1.21.4"
 
-      - name: Install Github CLI
+      - name: Install CI pre-requisites
         run: |
+          sudo apt install jq
           sudo apt-get install gh
 
-      - name: Build release image
+      - name: Get project version
+        run: |
+          VERSION=$(jq -r .version ./.github/specs.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.USER_GITHUB_NAME }}
+          password: ${{ secrets.USER_GITHUB_TOKEN }}
+
+      - name: Publish image
         env:
           GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
         run: |
-          docker login ghcr.io -u jgfranco17 --password ${{ secrets.USER_GITHUB_TOKEN }}
-          docker build -t aeternum:latest -f ./docker/server.Dockerfile .
-          docker push ghcr.io/jgfranco17/aeternum:latest
+          docker build -t ${{ env.DOCKER_REGISTRY }}/${{ secrets.USER_GITHUB_NAME }}/aeternum-ci:${{ env.VERSION }} -f ./docker/server.Dockerfile .
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ secrets.USER_GITHUB_NAME }}/aeternum-ci:${{ env.VERSION }}
