@@ -23,6 +23,10 @@ dmypy.json
 *.so
 *.dylib
 
+# Environments
+.env
+venv/
+
 # Test binary, built with `go test -c`
 *.test
 
