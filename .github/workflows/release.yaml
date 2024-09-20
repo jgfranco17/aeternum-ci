@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  DOCKER_REGISTRY: ghcr.io/jgfranco17/aeternum-ci
+  DOCKER_REGISTRY: ghcr.io
 
 jobs:
   release:
@@ -63,8 +63,18 @@ jobs:
           password: ${{ secrets.USER_GITHUB_TOKEN }}
 
       - name: Publish image
-        env:
-          GITHUB_TOKEN: ${{ secrets.USER_GITHUB_TOKEN }}
         run: |
-          docker build -t ${{ env.DOCKER_REGISTRY }}/${{ secrets.USER_GITHUB_NAME }}/aeternum-ci:${{ env.VERSION }} -f ./docker/server.Dockerfile .
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ secrets.USER_GITHUB_NAME }}/aeternum-ci:${{ env.VERSION }}
+          IMAGE=${{ env.DOCKER_REGISTRY }}/${{ secrets.USER_GITHUB_NAME }}/aeternum-ci:${{ env.VERSION }}
+          docker build -t $IMAGE -f ./docker/server.Dockerfile .
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Publish image
+        shell: bash
+        run: |
+          echo "## Created Docker image: v${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To pull the image locally, run the following:" >> $GITHUB_STEP_SUMMARY
+          echo '```shell' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.IMAGE }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
